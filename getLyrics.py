@@ -5,8 +5,11 @@ from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 
 # Define the list of songs and the artist
-songs = ["The Search", "Time", "Lie"]  # Add more songs as needed
-artist = "NF"
+songs = ["thank u, next", "touch it", "positions", "one last time", "no tears left to cry"]
+songs += ["nasa", "moonlight", "into you", "in my head", "imperfect for you"]
+songs += ["imagine", "greedy", "god is a woman", "ghostin", "everytime"]
+songs += ["dangerous woman", "bloodline", "bad idea", "34+35", "7 rings"]
+artist = "Ariana Grande"
 
 # Directory to save cleaned data
 save_dir = artist.replace(" ", "_").lower()
@@ -20,12 +23,14 @@ def fetch_lyrics(artist, title):
         return response.json().get('lyrics', '')
     return None
 
-def clean_lyrics(lyrics):
+def clean_lyrics(lyrics, artist):
     """Clean lyrics by removing stopwords, punctuation, making lowercase, and removing 'paroles de chanson'."""
     stop_words = set(stopwords.words('english'))
     # Remove punctuation and make lowercase
     lyrics = re.sub(r'[^\w\s]', '', lyrics).lower()
     lyrics = lyrics.replace('paroles de la chanson', '')
+    artist_pattern = re.escape('par ' + artist.lower())
+    lyrics = re.sub(artist_pattern, '', lyrics)
     # Tokenize and remove stopwords
     tokenized = word_tokenize(lyrics)
     cleaned = [word for word in tokenized if word not in stop_words]
@@ -41,7 +46,7 @@ def save_cleaned_lyrics(title, lyrics):
 for song in songs:
     raw_lyrics = fetch_lyrics(artist, song)
     if raw_lyrics:
-        cleaned_lyrics = clean_lyrics(raw_lyrics)
+        cleaned_lyrics = clean_lyrics(raw_lyrics, artist)
         save_cleaned_lyrics(song, cleaned_lyrics)
         print(f"Processed and saved lyrics for '{song}'")
     else:
