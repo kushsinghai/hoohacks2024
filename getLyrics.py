@@ -12,7 +12,8 @@ songs += ["Time", "DRIFTING", "Oh Lord", "GONE", "Change"]
 artist = "nf"
 
 # Directory to save cleaned data
-save_dir = artist.replace(" ", "_").lower()
+parent_dir = "Data"
+save_dir = os.path.join(parent_dir, artist.replace(" ", "_").lower())
 os.makedirs(save_dir, exist_ok=True)
 
 def fetch_lyrics(artist, title):
