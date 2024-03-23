@@ -1,51 +1,56 @@
 import os
 import pandas as pd
 from sklearn.model_selection import train_test_split
+from sklearn.feature_extraction.text import TfidfVectorizer
 
 full_df = pd.DataFrame()
 
+# creating the data frame since all data is in folders and across files
 def create_df():
-    base_directory_path = 'Data'  # base directory containing artist folders
+    base_directory_path = 'Data'
     data = []  # list holding texts and labels
-
     # iterate through each artist directory within data directory
     for artist_name in os.listdir(base_directory_path):
         artist_directory_path = os.path.join(base_directory_path, artist_name)
-        
-        # check if dir
-        if os.path.isdir(artist_directory_path):
-            # iterate through each file in the artist directory
+        if os.path.isdir(artist_directory_path): # check if dir & iterate through each file in the artist directory
             for filename in os.listdir(artist_directory_path):
                 if filename.endswith('.txt'):  # check for .txt
                     file_path = os.path.join(artist_directory_path, filename)
                     with open(file_path, 'r', encoding='utf-8') as file:
                         lyrics = file.read()
                         data.append({'lyrics': lyrics, 'artist': artist_name})
-
+    
     # convert list of df to directory
     global full_df
     full_df = pd.DataFrame(data)
     return full_df
 
+# split the data into features (X) and labels (y)
 def split_test_train(full_df):
-    # Split the data into features (X) and labels (y)
-    X = full_df['lyrics']  # Features (the lyrics)
-    y = full_df['artist']  # Labels (the artist names)
+    X = full_df['lyrics']  
+    y = full_df['artist'] 
 
-    # Split the dataset into training and testing sets
-    # test_size specifies the proportion of the dataset to include in the test split
+    # split data into train and test
+    # test_size is the proportion of the dataset to include in test split
     # random_state is a seed value for reproducibility of the split
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-
-    # Now you have your data split into:
-    # X_train, y_train: training features and labels
-    # X_test, y_test: testing features and labels
 
     print(f"Training set size: {len(X_train)} samples")
     print(f"Testing set size: {len(X_test)} samples")
 
+    return X_train, X_test, y_train, y_test
+
+# vectorize converts text into algorithmic format
+def vectorize(X_train, X_test):
+    # Initialize the TF-IDF Vectorizer
+    tfidf_vectorizer = TfidfVectorizer(stop_words='english', max_features=1000)
+    X_train_tfidf = tfidf_vectorizer.fit_transform(X_train) # fit model and transform the training data
+    X_test_tfidf = tfidf_vectorizer.transform(X_test)
+    return X_train_tfidf, X_test_tfidf, tfidf_vectorizer
+
 def main():
-    create_df()
-    split_test_train(full_df)
+    full_df = create_df()
+    X_train, X_test, y_train, y_test = split_test_train(full_df)
+    X_train_tfidf, X_test_tfidf, tfidf_vectorizer = vectorize(X_train, X_test)
 
 main()
