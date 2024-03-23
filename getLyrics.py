@@ -4,14 +4,14 @@ import requests
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 
-# Define the list of songs and the artist
+# define list of songs + artist
 songs = ["The Search", "Let You Down", "Lie", "HOPE", "HAPPY"]
 songs += ["Paralyzed", "Lie", "Running", "When I Grow Up", "JUST LIKE YOU"]
 songs += ["If You Want Love", "MISTAKE", "Hate Myself", "CLOUDS", "Remember This"]
 songs += ["Time", "DRIFTING", "Oh Lord", "GONE", "Change"]
 artist = "nf"
 
-# Directory to save cleaned data
+# director to save cleaned data
 parent_dir = "Data"
 save_dir = os.path.join(parent_dir, artist.replace(" ", "_").lower())
 os.makedirs(save_dir, exist_ok=True)
@@ -27,12 +27,12 @@ def fetch_lyrics(artist, title):
 def clean_lyrics(lyrics, artist):
     """Clean lyrics by removing stopwords, punctuation, making lowercase, and removing 'paroles de chanson'."""
     stop_words = set(stopwords.words('english'))
-    # Remove punctuation and make lowercase
+    # remove punctuation + make lower case
     lyrics = re.sub(r'[^\w\s]', '', lyrics).lower()
     lyrics = lyrics.replace('paroles de la chanson', '')
     artist_pattern = re.escape('par ' + artist.lower())
     lyrics = re.sub(artist_pattern, '', lyrics)
-    # Tokenize and remove stopwords
+    # tokenize + remove stopwords
     tokenized = word_tokenize(lyrics)
     cleaned = [word for word in tokenized if word not in stop_words]
     return ' '.join(cleaned)
