@@ -5,11 +5,11 @@ from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 
 # define list of songs + artist
-songs = ["The Search", "Let You Down", "Lie", "HOPE", "HAPPY"]
-songs += ["Paralyzed", "Lie", "Running", "When I Grow Up", "JUST LIKE YOU"]
-songs += ["If You Want Love", "MISTAKE", "Hate Myself", "CLOUDS", "Remember This"]
-songs += ["Time", "DRIFTING", "Oh Lord", "GONE", "Change"]
-artist = "nf"
+songs = ["ghost", "What Do You Mean", "Sorry", "Hold On", "Love Yourself"]
+songs += ["Yummy", "Boyfriend", "Off My Face", "Anyone", "Company"]
+songs += ["Hailey", "Somebody To Love", "One Time", "All That Matters", "Come Around Me"]
+songs += ["U smile", "2 much", "Lifetime", "Purpose", "Habitual"]
+artist = "Justin Bieber"
 
 # director to save cleaned data
 parent_dir = "Data"
