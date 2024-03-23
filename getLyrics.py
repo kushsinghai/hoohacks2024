@@ -5,11 +5,11 @@ from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 
 # Define the list of songs and the artist
-songs = ["thank u, next", "touch it", "positions", "one last time", "no tears left to cry"]
-songs += ["nasa", "moonlight", "into you", "in my head", "imperfect for you"]
-songs += ["imagine", "greedy", "god is a woman", "ghostin", "everytime"]
-songs += ["dangerous woman", "bloodline", "bad idea", "34+35", "7 rings"]
-artist = "Ariana Grande"
+songs = ["The Search", "Let You Down", "Lie", "HOPE", "HAPPY"]
+songs += ["Paralyzed", "Lie", "Running", "When I Grow Up", "JUST LIKE YOU"]
+songs += ["If You Want Love", "MISTAKE", "Hate Myself", "CLOUDS", "Remember This"]
+songs += ["Time", "DRIFTING", "Oh Lord", "GONE", "Change"]
+artist = "nf"
 
 # Directory to save cleaned data
 save_dir = artist.replace(" ", "_").lower()
