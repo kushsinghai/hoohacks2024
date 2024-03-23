@@ -1,2 +1,6 @@
 requests
 nltk
+numpy
+pandas
+sklearn.model_selection
+
