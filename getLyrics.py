@@ -15,6 +15,7 @@ artist = "Justin Bieber"
 parent_dir = "Data"
 save_dir = os.path.join(parent_dir, artist.replace(" ", "_").lower())
 os.makedirs(save_dir, exist_ok=True)
+global word_count
 
 def fetch_lyrics(artist, title):
     """Fetch lyrics for a given song."""
@@ -23,6 +24,13 @@ def fetch_lyrics(artist, title):
     if response.status_code == 200:
         return response.json().get('lyrics', '')
     return None
+
+def count_words_in_file(file_path):
+    with open(file_path, 'r', encoding='utf-8') as file:
+        contents = file.read()
+        words = contents.split()
+        word_count = len(words)
+    return word_count
 
 def clean_lyrics(lyrics, artist):
     """Clean lyrics by removing stopwords, punctuation, making lowercase, and removing 'paroles de chanson'."""
@@ -47,6 +55,7 @@ def save_cleaned_lyrics(title, lyrics):
 for song in songs:
     raw_lyrics = fetch_lyrics(artist, song)
     if raw_lyrics:
+        count_words_in_file(song)
         cleaned_lyrics = clean_lyrics(raw_lyrics, artist)
         save_cleaned_lyrics(song, cleaned_lyrics)
         print(f"Processed and saved lyrics for '{song}'")

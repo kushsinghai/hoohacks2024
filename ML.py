@@ -2,6 +2,8 @@ import os
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.naive_bayes import MultinomialNB
+from sklearn.metrics import accuracy_score, classification_report
 
 full_df = pd.DataFrame()
 
@@ -42,15 +44,31 @@ def split_test_train(full_df):
 
 # vectorize converts text into algorithmic format
 def vectorize(X_train, X_test):
-    # Initialize the TF-IDF Vectorizer
+    # initialize the TF-IDF Vectorizer
     tfidf_vectorizer = TfidfVectorizer(stop_words='english', max_features=1000)
     X_train_tfidf = tfidf_vectorizer.fit_transform(X_train) # fit model and transform the training data
     X_test_tfidf = tfidf_vectorizer.transform(X_test)
     return X_train_tfidf, X_test_tfidf, tfidf_vectorizer
 
+# initialize multinomial naive bayes classifier
+def train_naive_bayes(X_train_tfidf, y_train):
+    model = MultinomialNB()
+    model.fit(X_train_tfidf, y_train)
+    return model
+
+def evaluate_model(model, X_test_tfidf, y_test):
+    predictions = model.predict(X_test_tfidf)
+    accuracy = accuracy_score(y_test, predictions)
+    report = classification_report(y_test, predictions) 
+    print(f"Accuracy: {accuracy}")
+    print("Classification Report:")
+    print(report)
+
 def main():
     full_df = create_df()
     X_train, X_test, y_train, y_test = split_test_train(full_df)
     X_train_tfidf, X_test_tfidf, tfidf_vectorizer = vectorize(X_train, X_test)
+    model = train_naive_bayes(X_train_tfidf, y_train)
+    evaluate_model(model, X_test_tfidf, y_test)
 
 main()
