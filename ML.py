@@ -100,5 +100,7 @@ def main():
 
     model = train_naive_bayes(X_train_tfidf, y_train)
     evaluate_model(model, X_test_tfidf, y_test)
+    joblib.dump(model, 'naive_bayes_model.pkl')
+    joblib.dump(tfidf_vectorizer, 'tfidf_vectorizer.pkl')
 
 main()
