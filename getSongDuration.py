@@ -21,4 +21,19 @@ def getDuration(artist, songName):
         print(f"No duration data found for '{songName}' by '{artist}'")
         return None
 
+def getArtist(songName):
+    query = 'track:{}'.format(songName)
+    results = sp.search(q=query, type='track')
+    if results['tracks']['items']:
+        
+        return results['tracks']['items'][0]['artists'][0]['name']
+    else:
+        # Handle case where no results are found, perhaps return None or a default value
+        print(f"No duration data found for '{songName}' by '{artist}'")
+        return None
+    
 
+
+def main():
+    print(1048/getDuration("nf", 'Leave me alone'))
+    print(getArtist('uptown funk'))
