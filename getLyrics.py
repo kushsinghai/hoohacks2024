@@ -39,8 +39,10 @@ def clean_lyrics(lyrics, artist):
     lyrics = re.sub(artist_pattern, '', lyrics)
     # tokenize + remove stopwords
     tokenized = word_tokenize(lyrics)
-    # cleaned = [word for word in tokenized if word not in stop_words]
-    cleaned = [word for word in tokenized]
+    cleaned = [word for word in tokenized if word not in stop_words]
+    # Check that there are lyrics left after cleaning
+    if not cleaned:
+        raise ValueError(f"After cleaning, no lyrics remain for the song by {artist}. Check the cleaning process.")
     return ' '.join(cleaned)
 
 def save_cleaned_lyrics(title, lyrics):
