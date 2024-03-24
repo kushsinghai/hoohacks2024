@@ -15,6 +15,6 @@ def getDuration(artist, songName):
     # get duration of the track
     duration_ms = track['duration_ms']
     #print(duration_ms)
-    return duration_ms
+    return duration_ms / 60000
 
 

@@ -3,13 +3,17 @@ import re
 import requests
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
+from getSongDuration import getDuration
 
 # define list of songs + artist
-songs = ["Be alright", "What Do You Mean", "Sorry", "Hold On", "Love Yourself"]
-songs += ["Yummy", "Boyfriend", "Off My Face", "Anyone", "Company"]
-songs += ["Hailey", "Somebody To Love", "One Time", "All That Matters", "Come Around Me"]
-songs += ["U smile", "2 much", "Lifetime", "Purpose", "Habitual"]
-artist = "Justin Bieber"
+songs = ["Shape of You", "Galway Girl", "Happier", "Eraser", "Barcelona"]
+songs += ["Sing", "New Man", "Photograph", "Tenerife Sea", "Thinking out Loud"]
+songs += ["Shivers", "Bad Habits", "Save Myself", "Overpass Graffiti", "The A Team"]
+songs += ["Lego House", "Give Me Love", "Kiss Me", "Tides", "First Times"]
+songs += ["Perfect", "Eyes Closed", "End of Youth", "Castle on the Hill", "Celestial"]
+songs += ["Curtains", "American Town", "Tenerife Sea", "Boat", "Drunk"]
+artist = "Ed Sheeran"
+
 
 # director to save cleaned data
 parent_dir = "Data"
@@ -24,13 +28,6 @@ def fetch_lyrics(artist, title):
     if response.status_code == 200:
         return response.json().get('lyrics', '')
     return None
-
-# def count_words_in_file(file_path):
-#     with open(file_path, 'r', encoding='utf-8') as file:
-#         contents = file.read()
-#         words = contents.split()
-#         word_count = len(words)
-#     return word_count
 
 def clean_lyrics(lyrics, artist):
     """Clean lyrics by removing stopwords, punctuation, making lowercase, and removing 'paroles de chanson'."""
@@ -54,7 +51,7 @@ def save_cleaned_lyrics(title, lyrics):
     word_count = len(lyrics.split())
     with open(filepath, 'w', encoding='utf-8') as file:
         file.write(lyrics + "\n")
-        file.write(str(word_count))
+        file.write(str(word_count / getDuration(artist, title)))
 
     
 for song in songs:
