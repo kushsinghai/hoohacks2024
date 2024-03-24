@@ -5,16 +5,17 @@ from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 
 # define list of songs + artist
-songs = ["The Search", "Let You Down", "Lie", "HOPE", "HAPPY"]
-songs += ["Paralyzed", "Lie", "Running", "When I Grow Up", "JUST LIKE YOU"]
-songs += ["If You Want Love", "MISTAKE", "Hate Myself", "CLOUDS", "Remember This"]
-songs += ["Time", "DRIFTING", "Oh Lord", "GONE", "Change"]
-artist = "nf"
+songs = ["Be alright", "What Do You Mean", "Sorry", "Hold On", "Love Yourself"]
+songs += ["Yummy", "Boyfriend", "Off My Face", "Anyone", "Company"]
+songs += ["Hailey", "Somebody To Love", "One Time", "All That Matters", "Come Around Me"]
+songs += ["U smile", "2 much", "Lifetime", "Purpose", "Habitual"]
+artist = "Justin Bieber"
 
 # director to save cleaned data
 parent_dir = "Data"
 save_dir = os.path.join(parent_dir, artist.replace(" ", "_").lower())
 os.makedirs(save_dir, exist_ok=True)
+global word_count
 
 def fetch_lyrics(artist, title):
     """Fetch lyrics for a given song."""
@@ -23,6 +24,13 @@ def fetch_lyrics(artist, title):
     if response.status_code == 200:
         return response.json().get('lyrics', '')
     return None
+
+# def count_words_in_file(file_path):
+#     with open(file_path, 'r', encoding='utf-8') as file:
+#         contents = file.read()
+#         words = contents.split()
+#         word_count = len(words)
+#     return word_count
 
 def clean_lyrics(lyrics, artist):
     """Clean lyrics by removing stopwords, punctuation, making lowercase, and removing 'paroles de chanson'."""
@@ -34,7 +42,8 @@ def clean_lyrics(lyrics, artist):
     lyrics = re.sub(artist_pattern, '', lyrics)
     # tokenize + remove stopwords
     tokenized = word_tokenize(lyrics)
-    cleaned = [word for word in tokenized if word not in stop_words]
+    # cleaned = [word for word in tokenized if word not in stop_words]
+    cleaned = [word for word in tokenized]
     return ' '.join(cleaned)
 
 def save_cleaned_lyrics(title, lyrics):
@@ -47,6 +56,7 @@ def save_cleaned_lyrics(title, lyrics):
 for song in songs:
     raw_lyrics = fetch_lyrics(artist, song)
     if raw_lyrics:
+        # count_words_in_file(song)
         cleaned_lyrics = clean_lyrics(raw_lyrics, artist)
         save_cleaned_lyrics(song, cleaned_lyrics)
         print(f"Processed and saved lyrics for '{song}'")
