@@ -1,7 +1,7 @@
 import os
 import pandas as pd
 import numpy as np
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.metrics import accuracy_score, classification_report
@@ -40,7 +40,7 @@ def create_df():
                             print(f"File {filename} does not contain enough lines for WPM information.")
     global full_df
     full_df = pd.DataFrame(data)
-
+    
 
 # split the data into features (X) and labels (y)
 def split_test_train():
@@ -59,29 +59,37 @@ def split_test_train():
 
     return X_train, X_test, y_train, y_test
 
-# vectorize converts text into algorithmic format
-def vectorize(X_train_lyrics, X_test_lyrics):
-    # Temporarily remove the stop_words parameter or adjust the max_features
-    tfidf_vectorizer = TfidfVectorizer()
+def vectorize(X_train_lyrics, X_train_wpm, X_test_lyrics, X_test_wpm):
+    # Initialize the TF-IDF Vectorizer
+    tfidf_vectorizer = TfidfVectorizer(stop_words='english', max_features=1000)
 
-    try:
-        X_train_tfidf = tfidf_vectorizer.fit_transform(X_train_lyrics)
-    except ValueError as e:
-        print(f"Error fitting TF-IDF on the training set: {e}")
-        # Inspect the training data to understand the issue better
-        print(X_train_lyrics)
-        raise
+    # Fit the model and transform the training data
+    X_train_tfidf = tfidf_vectorizer.fit_transform(X_train_lyrics)
 
+    # Transform the test data
     X_test_tfidf = tfidf_vectorizer.transform(X_test_lyrics)
     
+    # Handle the 'wpm' feature. Assuming it's a dense array, no need for imputation as there are no NaNs based on the error screenshot
+    X_train_wpm = np.array(X_train_wpm).reshape(-1, 1)
+    X_test_wpm = np.array(X_test_wpm).reshape(-1, 1)
+
+    # Stack the WPM feature onto the TF-IDF feature matrix
+    X_train_tfidf = sp.hstack((X_train_tfidf, X_train_wpm), format='csr')
+    X_test_tfidf = sp.hstack((X_test_tfidf, X_test_wpm), format='csr')
+
     return X_train_tfidf, X_test_tfidf, tfidf_vectorizer
+
+
 
 # initialize multinomial naive bayes classifier
 def train_naive_bayes(X_train_tfidf, y_train):
-    model = MultinomialNB()
-    model.fit(X_train_tfidf, y_train)
-    return model
-
+    # Using GridSearchCV to find the best alpha parameter
+    nb_model = MultinomialNB()
+    parameters = {'alpha': [0.01, 0.1, 1, 10, 100]}
+    clf = GridSearchCV(nb_model, parameters, cv=5)
+    clf.fit(X_train_tfidf, y_train)
+    
+    return clf.best_estimator_
 def evaluate_model(model, X_test_tfidf, y_test):
     predictions = model.predict(X_test_tfidf)
     accuracy = accuracy_score(y_test, predictions)
@@ -91,23 +99,17 @@ def evaluate_model(model, X_test_tfidf, y_test):
     print(report)
 
 def main():
-    df = create_df()
-    X_train, X_test, y_train, y_test = split_test_train()
-    # Only pass the lyrics for TF-IDF vectorization
-    X_train_tfidf, X_test_tfidf, tfidf_vectorizer = vectorize(X_train['lyrics'], X_test['lyrics'])
-
-    # Make sure to include the WPM feature after TF-IDF vectorization
-    # Stack the WPM feature onto the TF-IDF feature matrix
-    X_train_tfidf = sp.hstack((X_train_tfidf, np.array(X_train['wpm']).reshape(-1, 1)), format='csr')
-    X_test_tfidf = sp.hstack((X_test_tfidf, np.array(X_test['wpm']).reshape(-1, 1)), format='csr')
-    print(X_test_tfidf)
-    #imputer = SimpleImputer(strategy='mean')
-
-    #X_train_tfidf = imputer.fit_transform(X_train_tfidf)
-    #X_test_tfidf = imputer.transform(X_test_tfidf)
-    model = train_naive_bayes(X_train_tfidf, y_train)
-    evaluate_model(model, X_test_tfidf, y_test)
-    joblib.dump(model, 'naive_bayes_model.pkl')
-    joblib.dump(tfidf_vectorizer, 'tfidf_vectorizer.pkl')
+    global full_df
+    create_df()
+    if not full_df.empty and 'wpm' in full_df.columns:
+        X_train, X_test, y_train, y_test = split_test_train()
+        X_train_tfidf, X_test_tfidf, tfidf_vectorizer = vectorize(
+            X_train['lyrics'], X_train['wpm'],
+            X_test['lyrics'], X_test['wpm']
+        )
+        model = train_naive_bayes(X_train_tfidf, y_train)
+        evaluate_model(model, X_test_tfidf, y_test)
+    else:
+        print("The DataFrame is empty or does not contain a 'wpm' column.")
 
 main()
