@@ -1,6 +1,8 @@
 import os
+import re
 import pandas as pd
 import numpy as np
+from sklearn import model_selection
 from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.naive_bayes import MultinomialNB
@@ -8,6 +10,13 @@ from sklearn.metrics import accuracy_score, classification_report
 import scipy.sparse as sp
 from sklearn.impute import SimpleImputer
 import joblib
+from joblib import load
+from nltk.corpus import stopwords
+from nltk.tokenize import word_tokenize
+
+
+
+
 
 full_df = pd.DataFrame()
 
@@ -98,6 +107,24 @@ def evaluate_model(model, X_test_tfidf, y_test):
     print("Classification Report:")
     print(report)
 
+def predict_artist(input_lyrics, input_wpm):
+
+
+    # Load the vectorizer and the model
+    tfidf_vectorizer = joblib.load('tfidf_vectorizer.pkl')
+    model = joblib.load('naive_bayes_model.pkl')
+
+    # Transform the lyrics with the vectorizer
+    lyrics_tfidf = tfidf_vectorizer.transform([input_lyrics])
+
+    # Stack the WPM feature onto the TF-IDF features
+    wpm_feature = np.array([input_wpm]).reshape(-1, 1)
+    combined_features = sp.hstack((lyrics_tfidf, wpm_feature))
+
+    # Predict the artist using the model
+    predicted_artist = model.predict(combined_features)
+    return predicted_artist[0]
+
 def main():
     global full_df
     create_df()
@@ -109,6 +136,8 @@ def main():
         )
         model = train_naive_bayes(X_train_tfidf, y_train)
         evaluate_model(model, X_test_tfidf, y_test)
+        joblib.dump(model, 'naive_bayes_model.pkl')
+        joblib.dump(tfidf_vectorizer, 'tfidf_vectorizer.pkl')
     else:
         print("The DataFrame is empty or does not contain a 'wpm' column.")
 

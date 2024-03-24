@@ -3,4 +3,8 @@ nltk
 numpy
 pandas
 sklearn.model_selection
-
+sklearn.feature_extraction
+sklearn.metrics
+scipy.sparse
+skrlearn.impute
+joblib
