@@ -48,11 +48,15 @@ def clean_lyrics(lyrics, artist):
 
 def save_cleaned_lyrics(title, lyrics):
     """Save cleaned lyrics to a text file within the artist's directory."""
+    global word_count
     filename = f"{title.lower().replace(' ', '_')}.txt"
     filepath = os.path.join(save_dir, filename)
+    word_count = len(lyrics.split())
     with open(filepath, 'w', encoding='utf-8') as file:
-        file.write(lyrics)
+        file.write(lyrics + "\n")
+        file.write(str(word_count))
 
+    
 for song in songs:
     raw_lyrics = fetch_lyrics(artist, song)
     if raw_lyrics:
